@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>chat-PT · Evidence-Based Physiotherapy AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #0a0c10;
+      --bg2:      #0e1117;
+      --bg3:      #13161e;
+      --bg4:      #191d28;
+      --bg5:      #1f2330;
+      --border:   rgba(255,255,255,0.06);
+      --border2:  rgba(255,255,255,0.11);
+      --text:     #e8eaf0;
+      --text2:    #838799;
+      --text3:    #454960;
+      --teal:     #4ecdc4;
+      --teal2:    #38b2aa;
+      --teal-glow:rgba(78,205,196,0.10);
+      --teal-soft:rgba(78,205,196,0.06);
+      --sage:     #8fb8ad;
+      --gold:     #c9a96e;
+      --gold-bg:  rgba(201,169,110,0.08);
+      --blue:     #5b8dee;
+      --blue-bg:  rgba(91,141,238,0.08);
+      --red:      #e06060;
+      --green:    #5cb98c;
+      --green-bg: rgba(92,185,140,0.08);
+      --sidebar-w:270px;
+      --header-h: 58px;
+      --radius:   16px;
+      --radius-sm:10px;
+      --radius-xs:7px;
+      --font-body:'DM Sans', sans-serif;
+      --font-display:'Playfair Display', serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100dvh;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg5); border-radius: 4px; }
+
+    /* ── Ambient background ── */
+    body::before {
+      content:'';
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 10%, rgba(78,205,196,0.045) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(91,141,238,0.04) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 60% at 60% 20%, rgba(201,169,110,0.025) 0%, transparent 60%);
+    }
+
+    /* ──────────────── SIDEBAR ──────────────── */
+    #sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      flex-shrink: 0; z-index: 100;
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      position: relative;
+    }
+    #sidebar::after {
+      content:''; position:absolute; top:0; right:0; bottom:0; width:1px;
+      background: linear-gradient(to bottom, transparent, rgba(78,205,196,0.15) 40%, rgba(78,205,196,0.08) 60%, transparent);
+      pointer-events:none;
+    }
+
+    .sidebar-logo {
+      padding: 20px 18px 16px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #2a4a45, #1a3530);
+      border: 1px solid rgba(78,205,196,0.3);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+      box-shadow: 0 0 18px rgba(78,205,196,0.12);
+    }
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 1.15rem; font-weight: 600;
+      color: var(--text); letter-spacing: -0.2px;
+    }
+    .logo-text span { color: var(--teal); }
+    .logo-sub {
+      font-size: 0.62rem; color: var(--text3);
+      letter-spacing: 1px; margin-top: 2px;
+      text-transform: uppercase; font-weight: 500;
+    }
+
+    .new-chat-btn {
+      margin: 14px 14px 8px;
+      background: linear-gradient(135deg, var(--bg4), var(--bg5));
+      border: 1px solid var(--border2);
+      color: var(--text); border-radius: var(--radius-sm);
+      padding: 10px 16px; font-size: 0.83rem; font-weight: 500;
+      cursor: pointer; display: flex; align-items: center; gap: 9px;
+      transition: all 0.2s; font-family: var(--font-body);
+      width: calc(100% - 28px);
+    }
+    .new-chat-btn:hover {
+      background: linear-gradient(135deg, var(--bg5), #252a38);
+      border-color: rgba(78,205,196,0.2);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .new-chat-btn svg { color: var(--teal); }
+
+    .sidebar-section { padding: 16px 14px 6px; }
+    .sidebar-label {
+      font-size: 0.6rem; font-weight: 600; color: var(--text3);
+      letter-spacing: 1.2px; text-transform: uppercase;
+      padding: 0 6px 10px;
+    }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: var(--radius-xs);
+      font-size: 0.83rem; color: var(--text2);
+      cursor: pointer; transition: all 0.18s;
+      border: 1px solid transparent;
+    }
+    .sidebar-item:hover {
+      background: var(--bg4); color: var(--text);
+      border-color: var(--border);
+    }
+    .sidebar-item.active {
+      background: var(--teal-soft);
+      color: var(--teal); border-color: rgba(78,205,196,0.15);
+    }
+    .soon-badge {
+      margin-left: auto; font-size: 0.58rem;
+      background: var(--gold-bg); color: var(--gold);
+      padding: 2px 8px; border-radius: 10px;
+      font-weight: 600; letter-spacing: 0.5px;
+      border: 1px solid rgba(201,169,110,0.2);
+    }
+
+    .sidebar-divider {
+      height: 1px; background: var(--border);
+      margin: 10px 14px;
+    }
+
+    .sidebar-bottom { margin-top: auto; padding: 14px; border-top: 1px solid var(--border); }
+    .stats-card {
+      background: linear-gradient(135deg, var(--bg3), var(--bg4));
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); padding: 15px;
+      cursor: pointer; transition: all 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .stats-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, transparent, rgba(78,205,196,0.3), transparent);
+    }
+    .stats-card:hover { background: linear-gradient(135deg, var(--bg4), var(--bg5)); }
+    .stats-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .stats-title { font-size: 0.72rem; font-weight: 500; color: var(--text2); letter-spacing: 0.3px; }
+    .stats-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 8px var(--teal), 0 0 16px rgba(78,205,196,0.4);
+      animation: pulse-dot 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100%{ box-shadow: 0 0 8px var(--teal), 0 0 16px rgba(78,205,196,0.4); }
+      50%{ box-shadow: 0 0 12px var(--teal), 0 0 24px rgba(78,205,196,0.6); }
+    }
+    .stats-num {
+      font-family: var(--font-display);
+      font-size: 1.6rem; font-weight: 600;
+      color: var(--text); letter-spacing: -1px;
+    }
+    .stats-sub { font-size: 0.67rem; color: var(--text3); margin-top: 4px; }
+
+    /* ──────────────── MAIN ──────────────── */
+    #main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
+
+    /* ── Header ── */
+    #header {
+      height: var(--header-h);
+      background: rgba(14,17,23,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 20px; gap: 14px; flex-shrink: 0;
+    }
+    #menu-btn {
+      display: none; background: none; border: none;
+      color: var(--text2); cursor: pointer; padding: 8px;
+      border-radius: var(--radius-xs); line-height: 0;
+      transition: all 0.15s;
+    }
+    #menu-btn:hover { background: var(--bg4); color: var(--teal); }
+    .header-brand { display: flex; align-items: center; gap: 10px; }
+    .header-brand-icon {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, #2a4a45, #1a3530);
+      border: 1px solid rgba(78,205,196,0.25);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .header-title {
+      font-family: var(--font-display);
+      font-size: 1rem; font-weight: 600; color: var(--text);
+    }
+    .header-title span { color: var(--teal); }
+    .header-sub { font-size: 0.68rem; color: var(--text3); margin-top: 1px; font-weight: 400; }
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+    .pill-btn {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--bg4); border: 1px solid var(--border2);
+      color: var(--text2); border-radius: 24px;
+      padding: 7px 15px; font-size: 0.77rem; font-weight: 500;
+      cursor: pointer; transition: all 0.18s;
+      font-family: var(--font-body); white-space: nowrap;
+    }
+    .pill-btn:hover {
+      background: var(--bg5); color: var(--text);
+      border-color: rgba(78,205,196,0.2);
+    }
+    .pill-btn.teal {
+      color: var(--teal);
+      border-color: rgba(78,205,196,0.22);
+      background: var(--teal-soft);
+    }
+    .pill-btn.teal:hover { background: var(--teal-glow); }
+
+    /* ── Upload Panel ── */
+    #upload-panel {
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.42s cubic-bezier(.4,0,.2,1);
+    }
+    #upload-panel.open { max-height: 420px; }
+    .upload-inner { padding: 20px 24px; display: flex; gap: 20px; flex-wrap: wrap; }
+
+    #drop-zone {
+      flex: 1; min-width: 200px;
+      border: 1.5px dashed var(--border2);
+      border-radius: var(--radius); padding: 30px 20px;
+      text-align: center; cursor: pointer;
+      transition: all 0.22s;
+      background: var(--bg3);
+      position: relative; overflow: hidden;
+    }
+    #drop-zone::before {
+      content:''; position:absolute; inset:0; opacity:0;
+      background: radial-gradient(ellipse at center, var(--teal-soft), transparent);
+      transition: opacity 0.22s;
+    }
+    #drop-zone:hover::before, #drop-zone.dragover::before { opacity:1; }
+    #drop-zone:hover, #drop-zone.dragover {
+      border-color: var(--teal);
+      box-shadow: 0 0 20px rgba(78,205,196,0.08);
+    }
+    .drop-icon { font-size: 2rem; margin-bottom: 10px; opacity: 0.8; }
+    .drop-text { font-size: 0.82rem; color: var(--text2); line-height: 1.7; position: relative; }
+    .drop-text strong { color: var(--teal); font-weight: 500; }
+    .drop-limit { font-size: 0.7rem; color: var(--text3); margin-top: 6px; position: relative; }
+    #file-chosen { font-size: 0.75rem; color: var(--teal); margin-top: 10px; position: relative; font-weight: 500; }
+    #file-input { display: none; }
+
+    .upload-fields { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 10px; }
+    .field-label { font-size: 0.62rem; font-weight: 600; color: var(--text3); margin-bottom: 4px; letter-spacing: 0.8px; text-transform: uppercase; }
+    .field-row { display: flex; gap: 10px; }
+    .upload-fields input, .upload-fields select {
+      width: 100%;
+      background: var(--bg3); border: 1px solid var(--border2);
+      color: var(--text); border-radius: var(--radius-sm);
+      padding: 10px 13px; font-size: 0.82rem; outline: none;
+      font-family: var(--font-body); transition: border-color 0.15s;
+    }
+    .upload-fields input:focus, .upload-fields select:focus { border-color: var(--teal); }
+    .upload-fields select option { background: var(--bg3); }
+
+    #upload-btn {
+      background: linear-gradient(135deg, #1f4a44, #163730);
+      color: var(--teal); border: 1px solid rgba(78,205,196,0.3);
+      border-radius: var(--radius-sm); padding: 11px 18px;
+      font-size: 0.87rem; font-weight: 500; cursor: pointer;
+      transition: all 0.2s; width: 100%; font-family: var(--font-body);
+      letter-spacing: 0.2px;
+    }
+    #upload-btn:hover {
+      background: linear-gradient(135deg, #265a52, #1c4038);
+      box-shadow: 0 4px 20px rgba(78,205,196,0.15);
+    }
+    #upload-btn:disabled { background: var(--bg5); color: var(--text3); border-color: var(--border); cursor: not-allowed; box-shadow: none; }
+    #upload-status { font-size: 0.75rem; color: var(--text3); min-height: 16px; line-height: 1.5; }
+    #upload-progress { width: 100%; height: 2px; background: var(--bg5); border-radius: 2px; overflow: hidden; display: none; margin-top: 5px; }
+    #upload-progress-bar { height: 100%; background: linear-gradient(90deg, var(--teal2), var(--teal)); width: 0%; transition: width 0.35s; border-radius: 2px; }
+
+    /* ── Chat box ── */
+    #chat-box { flex: 1; overflow-y: auto; padding: 28px 0 10px; scroll-behavior: smooth; }
+    .msg-wrap { max-width: 780px; margin: 0 auto; padding: 0 22px; display: flex; flex-direction: column; }
+
+    /* ── Welcome ── */
+    .welcome {
+      max-width: 640px; margin: auto;
+      text-align: center; padding: 56px 24px 40px;
+      animation: fadeUp 0.6s ease;
+    }
+    .welcome-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #1e3a35, #132820);
+      border: 1px solid rgba(78,205,196,0.25);
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; margin: 0 auto 24px;
+      box-shadow: 0 12px 40px rgba(78,205,196,0.15), 0 0 0 1px rgba(78,205,196,0.08);
+      position: relative;
+    }
+    .welcome-icon::after {
+      content:''; position:absolute;
+      inset:-8px; border-radius:30px;
+      background: radial-gradient(ellipse, rgba(78,205,196,0.06), transparent 70%);
+    }
+    .welcome h2 {
+      font-family: var(--font-display);
+      font-size: 2rem; font-weight: 600;
+      letter-spacing: -0.5px; margin-bottom: 14px;
+      background: linear-gradient(135deg, #e8eaf0 20%, #8fb8ad 80%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.25;
+    }
+    .welcome p { color: var(--text2); font-size: 0.93rem; line-height: 1.85; font-weight: 300; }
+    .welcome p strong { color: var(--teal); font-weight: 500; -webkit-text-fill-color: var(--teal); }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 30px; }
+    .chip {
+      background: var(--bg3); border: 1px solid var(--border2);
+      color: var(--text2); padding: 10px 18px; border-radius: 24px;
+      font-size: 0.8rem; cursor: pointer; transition: all 0.22s;
+      font-family: var(--font-body); display: flex; align-items: center; gap: 7px;
+      position: relative; overflow: hidden;
+    }
+    .chip::before {
+      content:''; position:absolute; inset:0; opacity:0;
+      background: linear-gradient(135deg, var(--teal-soft), transparent);
+      transition: opacity 0.22s;
+    }
+    .chip-arrow { color: var(--teal); font-size: 0.75rem; transition: transform 0.2s; }
+    .chip:hover::before { opacity:1; }
+    .chip:hover {
+      color: var(--text); border-color: rgba(78,205,196,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+    .chip:hover .chip-arrow { transform: translateX(3px); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Message rows ── */
+    .msg-row {
+      display: flex; gap: 12px; padding: 5px 0;
+      align-items: flex-start; animation: fadeUp 0.3s ease;
+    }
+    .msg-row.user { flex-direction: row-reverse; }
+
+    .avatar {
+      width: 32px; height: 32px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0; font-weight: 600; margin-top: 3px;
+    }
+    .avatar.bot {
+      background: linear-gradient(135deg, #1e3a35, #132820);
+      border: 1px solid rgba(78,205,196,0.22);
+      color: var(--teal); font-size: 15px;
+      box-shadow: 0 4px 12px rgba(78,205,196,0.08);
+    }
+    .avatar.user { background: var(--bg4); border: 1px solid var(--border2); color: var(--text2); font-size: 10px; letter-spacing: 0.3px; }
+
+    .bubble {
+      max-width: min(680px, 85%); padding: 14px 18px;
+      border-radius: 18px; line-height: 1.8;
+      font-size: 0.91rem; animation: fadeUp 0.3s ease;
+    }
+    .bubble.user {
+      background: linear-gradient(135deg, #1c2035, #161828);
+      border: 1px solid rgba(91,141,238,0.18);
+      border-top-right-radius: 4px; color: var(--text);
+      white-space: pre-wrap;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      font-weight: 300;
+    }
+    .bubble.bot {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-top-left-radius: 4px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    }
+    .bubble.system {
+      background: rgba(78,205,196,0.05);
+      border: 1px solid rgba(78,205,196,0.15);
+      color: var(--teal); font-size: 0.78rem;
+      border-radius: 10px; white-space: pre-wrap;
+      align-self: center; max-width: 90%;
+      text-align: center; padding: 8px 18px;
+      font-weight: 400;
+    }
+
+    /* ── Typing ── */
+    .typing-dots { display: flex; gap: 5px; padding: 4px 2px; align-items: center; }
+    .typing-dots span {
+      width: 6px; height: 6px; background: var(--text3);
+      border-radius: 50%; animation: tbounce 1.3s ease-in-out infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes tbounce { 0%,60%,100%{transform:translateY(0);opacity:0.5} 30%{transform:translateY(-7px);opacity:1} }
+
+    /* ── Bot rich content ── */
+    .bot-body { line-height: 1.8; }
+    .bot-body h1 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: var(--text); margin: 16px 0 8px; padding-bottom: 7px; border-bottom: 1px solid var(--border); }
+    .bot-body h2 { font-size: 0.93rem; font-weight: 600; color: var(--teal); margin: 14px 0 6px; }
+    .bot-body h3 { font-size: 0.8rem; font-weight: 600; color: var(--text2); margin: 10px 0 4px; text-transform: uppercase; letter-spacing: 0.7px; }
+    .bot-body p { margin: 6px 0; color: var(--text); font-weight: 300; }
+    .bot-body ul, .bot-body ol { padding-left: 20px; margin: 8px 0; }
+    .bot-body li { margin: 5px 0; color: var(--text); font-weight: 300; }
+    .bot-body li::marker { color: var(--teal); }
+    .bot-body strong { color: var(--text); font-weight: 600; }
+    .bot-body em { color: var(--sage); font-style: italic; }
+    .bot-body code { background: var(--bg5); color: var(--teal); padding: 2px 7px; border-radius: 5px; font-size: 0.82rem; font-family: 'SF Mono','Fira Code',monospace; border: 1px solid var(--border2); }
+    .bot-body hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+    .bot-body blockquote { border-left: 2px solid var(--teal); padding-left: 14px; margin: 10px 0; color: var(--text2); font-style: italic; font-weight: 300; }
+    .ev-badge { display: inline-flex; align-items: center; font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin: 0 2px; vertical-align: middle; letter-spacing: 0.3px; }
+    .ev-high { background: var(--green-bg); color: var(--green); border: 1px solid rgba(92,185,140,0.25); }
+    .ev-medium { background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(201,169,110,0.25); }
+    .ev-info { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(91,141,238,0.25); }
+    .src-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+    .src-label { font-size: 0.68rem; font-weight: 500; color: var(--text3); margin-right: 2px; }
+    .src-tag { background: var(--bg5); border: 1px solid var(--border); border-radius: 6px; padding: 3px 9px; font-size: 0.68rem; color: var(--text2); }
+
+    /* ── Input area ── */
+    #input-area {
+      padding: 14px 20px 18px;
+      background: rgba(14,17,23,0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .input-wrap {
+      max-width: 780px; margin: 0 auto;
+      background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: var(--radius); display: flex;
+      align-items: flex-end; transition: border-color 0.18s;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    }
+    .input-wrap:focus-within {
+      border-color: rgba(78,205,196,0.35);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2), 0 0 0 3px rgba(78,205,196,0.06);
+    }
+    #sem-select {
+      background: transparent; border: none;
+      border-right: 1px solid var(--border);
+      color: var(--text2); padding: 0 14px;
+      font-size: 0.78rem; cursor: pointer;
+      outline: none; height: 52px;
+      font-family: var(--font-body); flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    #sem-select:focus { color: var(--teal); }
+    #sem-select option { background: var(--bg3); }
+    #user-input {
+      flex: 1; background: transparent; border: none;
+      color: var(--text); padding: 15px 16px;
+      font-size: 0.91rem; resize: none; outline: none;
+      max-height: 150px; min-height: 52px;
+      line-height: 1.65; font-family: var(--font-body);
+      font-weight: 300;
+    }
+    #user-input::placeholder { color: var(--text3); }
+    #send-btn {
+      background: linear-gradient(135deg, #1f4a44, #163730);
+      color: var(--teal); border: none;
+      padding: 0 18px; height: 52px;
+      font-size: 0.9rem; cursor: pointer;
+      transition: all 0.18s; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border-left: 1px solid rgba(78,205,196,0.15);
+    }
+    #send-btn:hover {
+      background: linear-gradient(135deg, #265a52, #1c4038);
+      box-shadow: inset 0 0 20px rgba(78,205,196,0.08);
+    }
+    #send-btn:disabled { background: var(--bg5); color: var(--text3); cursor: not-allowed; border-color: var(--border); }
+    .input-hint { font-size: 0.65rem; color: var(--text3); text-align: center; margin-top: 8px; }
+
+    /* ── Mobile overlay ── */
+    #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 90; backdrop-filter: blur(4px); }
+    #overlay.show { display: block; }
+
+    /* ── Responsive ── */
+    @media (max-width: 720px) {
+      :root { --sidebar-w: 290px; }
+      #sidebar { position: fixed; top: 0; left: 0; height: 100%; transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); box-shadow: 6px 0 40px rgba(0,0,0,0.6); }
+      #menu-btn { display: flex; }
+      #upload-panel.open { max-height: 580px; }
+      .upload-inner { flex-direction: column; padding: 16px 16px; }
+      #drop-zone { min-width: unset; }
+      .upload-fields { min-width: unset; }
+      .field-row { flex-direction: column; }
+      .msg-wrap { padding: 0 14px; }
+      .bubble { max-width: 92%; font-size: 0.88rem; padding: 12px 14px; }
+      #input-area { padding: 10px 14px 14px; }
+      .input-hint { display: none; }
+      .pill-btn .pill-label { display: none; }
+      .pill-btn { padding: 7px 11px; }
+      .welcome { padding: 44px 16px 28px; }
+      .welcome h2 { font-size: 1.55rem; }
+      .welcome p { font-size: 0.88rem; }
+    }
+    @media (max-width: 420px) {
+      .bubble { max-width: 96%; }
+      #sem-select { display: none; }
+      .avatar { width: 28px; height: 28px; font-size: 13px; }
+      .welcome h2 { font-size: 1.3rem; }
+    }
+
+    /* ── Safe area for notch phones ── */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      #input-area { padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<div id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🩺</div>
+    <div>
+      <div class="logo-text">chat<span>-PT</span></div>
+      <div class="logo-sub">Physiotherapy AI</div>
+    </div>
+  </div>
+
+  <button class="new-chat-btn" onclick="newChat()">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    New conversation
+  </button>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Study Mode</div>
+    <div class="sidebar-item active">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Chat &amp; Ask
+    </div>
+    <div class="sidebar-item" onclick="alert('Quiz Mode coming soon! 🎉')">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Quiz Mode <span class="soon-badge">SOON</span>
+    </div>
+    <div class="sidebar-item" onclick="toggleUpload()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload PDF
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Browse by Subject</div>
+    <div class="sidebar-item" onclick="quickAsk('Anatomy')">🦴 &nbsp;Anatomy</div>
+    <div class="sidebar-item" onclick="quickAsk('Physiology')">🫀 &nbsp;Physiology</div>
+    <div class="sidebar-item" onclick="quickAsk('Musculoskeletal Physiotherapy')">💪 &nbsp;MSK PT</div>
+    <div class="sidebar-item" onclick="quickAsk('Neurological Physiotherapy')">🧠 &nbsp;Neuro PT</div>
+    <div class="sidebar-item" onclick="quickAsk('Cardiopulmonary Physiotherapy')">❤️ &nbsp;Cardio PT</div>
+    <div class="sidebar-item" onclick="quickAsk('Electrotherapy')">⚡ &nbsp;Electrotherapy</div>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="stats-card" onclick="showStats()">
+      <div class="stats-row">
+        <span class="stats-title">Knowledge Base</span>
+        <span class="stats-dot"></span>
+      </div>
+      <div class="stats-num" id="sidebar-doc-count">—</div>
+      <div class="stats-sub">verified documents loaded</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div id="main">
+
+  <!-- Header -->
+  <div id="header">
+    <button id="menu-btn" onclick="openSidebar()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="header-brand">
+      <div class="header-brand-icon">🩺</div>
+      <div>
+        <div class="header-title">chat<span>-PT</span></div>
+        <div class="header-sub">Evidence-based · BPT Sem 1 → Internship</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="pill-btn teal" onclick="showStats()">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span class="pill-label">Stats</span>
+      </button>
+      <button class="pill-btn" onclick="toggleUpload()">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span class="pill-label">Upload PDF</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Upload Panel -->
+  <div id="upload-panel">
+    <div class="upload-inner">
+      <div id="drop-zone"
+        onclick="document.getElementById('file-input').click()"
+        ondragover="handleDragOver(event)"
+        ondragleave="handleDragLeave(event)"
+        ondrop="handleDrop(event)">
+        <div class="drop-icon">📄</div>
+        <div class="drop-text"><strong>Drop PDF here</strong><br/>or click to browse</div>
+        <div class="drop-limit">Max file size: 5 MB</div>
+        <div id="file-chosen"></div>
+      </div>
+      <input type="file" id="file-input" accept=".pdf" onchange="fileChosen(event)"/>
+      <div class="upload-fields">
+        <div>
+          <div class="field-label">Book / Source Name *</div>
+          <input type="text" id="up-source" placeholder="e.g. Gray's Anatomy 42nd Ed"/>
+        </div>
+        <div>
+          <div class="field-label">Subject *</div>
+          <select id="up-subject">
+            <option value="Anatomy">Anatomy</option>
+            <option value="Physiology">Physiology</option>
+            <option value="Musculoskeletal Physiotherapy">Musculoskeletal PT</option>
+            <option value="Neurological Physiotherapy">Neurological PT</option>
+            <option value="Cardiopulmonary Physiotherapy">Cardiopulmonary PT</option>
+            <option value="Paediatric Physiotherapy">Paediatric PT</option>
+            <option value="Biomechanics">Biomechanics / Kinesiology</option>
+            <option value="Electrotherapy">Electrotherapy</option>
+            <option value="Physiotherapy">General Physiotherapy</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div style="flex:1">
+            <div class="field-label">Evidence Level</div>
+            <select id="up-evidence">
+              <option value="Textbook">Textbook</option>
+              <option value="Systematic Review">Systematic Review</option>
+              <option value="Meta-Analysis">Meta-Analysis</option>
+              <option value="RCT">RCT</option>
+              <option value="Research Article">Research Article</option>
+            </select>
+          </div>
+          <div style="width:90px">
+            <div class="field-label">Year</div>
+            <input type="number" id="up-year" value="2023" min="1900" max="2030"/>
+          </div>
+        </div>
+        <button id="upload-btn" onclick="uploadPDF()" disabled>Upload &amp; Process PDF</button>
+        <div id="upload-status"></div>
+        <div id="upload-progress"><div id="upload-progress-bar"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat box -->
+  <div id="chat-box">
+    <div class="msg-wrap">
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon">🩺</div>
+        <h2>Hello, Physiotherapy Professionals 👋</h2>
+        <p>I'm <strong>Chat-PT</strong> — your evidence-based physiotherapy AI companion. Ask me anything from Sem 1 through Internship.</p>
+        <div class="chips">
+          <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>Frozen shoulder rehabilitation</div>
+          <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>Stages of stroke recovery</div>
+          <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>Rotator cuff anatomy</div>
+          <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>MCQ: Common physio topics</div>
+          <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>Gait cycle phases</div>
+          <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>Maitland mobilisation grades</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input area -->
+  <div id="input-area">
+    <div class="input-wrap">
+      <select id="sem-select" title="Semester">
+        <option value="general">All Sems</option>
+        <option value="sem1">Sem 1</option>
+        <option value="sem2">Sem 2</option>
+        <option value="sem3">Sem 3</option>
+        <option value="sem4">Sem 4</option>
+        <option value="clinical">Clinical / Internship</option>
+      </select>
+      <textarea id="user-input"
+        placeholder="Ask anything — anatomy, physio, clinical cases…"
+        rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+      <button id="send-btn" onclick="sendMessage()">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line</div>
+  </div>
+</div>
+
+<script>
+  const API = "https://jjjjjaaaavvvv-chat-pt-backend.hf.space";
+  const SESSION_ID = "session_" + Math.random().toString(36).substr(2, 9);
+  let selectedFile = null;
+  let docCount = 0;
+
+  fetch(API + "/health").catch(() => {});
+
+  (async () => {
+    try {
+      const r = await fetch(API + "/knowledge-stats");
+      const d = await r.json();
+      docCount = d.total_documents;
+      document.getElementById('sidebar-doc-count').textContent = docCount.toLocaleString();
+    } catch(e) {}
+  })();
+
+  function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('overlay').classList.add('show');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+  }
+  function quickAsk(subject) {
+    document.getElementById('user-input').value = "Give me an overview of " + subject;
+    closeSidebar();
+    document.getElementById('user-input').focus();
+  }
+  function newChat() {
+    const box = document.getElementById('chat-box');
+    box.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'msg-wrap';
+    wrap.innerHTML = `<div class="welcome" id="welcome">
+      <div class="welcome-icon">🩺</div>
+      <h2>Hello, Physiotherapy Professionals 👋</h2>
+      <p>I'm <strong>Chat-PT</strong> — your evidence-based physiotherapy AI companion. Ask me anything from Sem 1 through Internship.</p>
+      <div class="chips">
+        <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>Frozen shoulder rehabilitation</div>
+        <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>Stages of stroke recovery</div>
+        <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>Rotator cuff anatomy</div>
+        <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>MCQ: Common physio topics</div>
+        <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>Gait cycle phases</div>
+        <div class="chip" onclick="askChip(this)"><span class="chip-arrow">→</span>Maitland mobilisation grades</div>
+      </div>
+    </div>`;
+    box.appendChild(wrap);
+    closeSidebar();
+  }
+
+  function toggleUpload() {
+    document.getElementById('upload-panel').classList.toggle('open');
+    closeSidebar();
+  }
+  function handleDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('dragover'); }
+  function handleDragLeave() { document.getElementById('drop-zone').classList.remove('dragover'); }
+  function handleDrop(e) {
+    e.preventDefault(); document.getElementById('drop-zone').classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type === 'application/pdf') setFile(f);
+    else setUpStatus('Please drop a PDF file', 'var(--gold)');
+  }
+  function fileChosen(e) { if (e.target.files[0]) setFile(e.target.files[0]); }
+  function setFile(f) {
+    selectedFile = f;
+    document.getElementById('file-chosen').textContent = '✓ ' + f.name;
+    document.getElementById('upload-btn').disabled = false;
+    setUpStatus('', '');
+  }
+  function setUpStatus(msg, color) {
+    const el = document.getElementById('upload-status');
+    el.textContent = msg; el.style.color = color || 'var(--text3)';
+  }
+
+  async function uploadPDF() {
+    if (!selectedFile) return;
+
+    // 5MB size limit
+    const MAX_SIZE_MB = 5;
+    const fileSizeMB = selectedFile.size / (1024 * 1024);
+    if (fileSizeMB > MAX_SIZE_MB) {
+      setUpStatus(
+        '⚠️ File too large (' + fileSizeMB.toFixed(1) + 'MB). Max 5MB allowed. Large textbooks are added by the admin. Research papers & notes under 5MB work great!',
+        'var(--gold)'
+      );
+      return;
+    }
+
+    const source = document.getElementById('up-source').value.trim();
+    if (!source) { setUpStatus('Please enter a source name', 'var(--gold)'); return; }
+
+    const btn = document.getElementById('upload-btn');
+    const bar = document.getElementById('upload-progress');
+    const fill = document.getElementById('upload-progress-bar');
+    btn.disabled = true; bar.style.display = 'block'; fill.style.width = '15%';
+    setUpStatus('Uploading…', 'var(--blue)');
+
+    const fd = new FormData();
+    fd.append('file', selectedFile);
+    fd.append('source_name', source);
+    fd.append('subject', document.getElementById('up-subject').value);
+    fd.append('evidence_level', document.getElementById('up-evidence').value);
+    fd.append('year', document.getElementById('up-year').value);
+
+    try {
+      fill.style.width = '50%';
+      const res = await fetch(API + "/upload-pdf", { method: 'POST', body: fd });
+      fill.style.width = '90%';
+      const d = await res.json();
+      if (res.ok) {
+        fill.style.width = '100%';
+        setUpStatus('✓ ' + d.chunks_added + ' chunks from ' + d.pages + ' pages added', 'var(--teal)');
+        addSystemMsg('📚 Loaded "' + source + '" — ' + d.chunks_added + ' chunks · ' + d.pages + ' pages');
+        docCount += d.chunks_added;
+        document.getElementById('sidebar-doc-count').textContent = docCount.toLocaleString();
+        selectedFile = null;
+        document.getElementById('file-chosen').textContent = '';
+        document.getElementById('up-source').value = '';
+        document.getElementById('file-input').value = '';
+        setTimeout(function() { bar.style.display = 'none'; fill.style.width = '0%'; }, 2000);
+      } else {
+        setUpStatus('Upload failed: ' + (d.detail || 'Unknown error'), 'var(--red)');
+        fill.style.width = '0%';
+      }
+    } catch(e) {
+      setUpStatus('Connection error — is the backend running?', 'var(--red)');
+      fill.style.width = '0%';
+    }
+    btn.disabled = false;
+  }
+
+  async function showStats() {
+    try {
+      const r = await fetch(API + "/knowledge-stats");
+      const d = await r.json();
+      docCount = d.total_documents;
+      document.getElementById('sidebar-doc-count').textContent = docCount.toLocaleString();
+      addSystemMsg('📊 Knowledge Base · ' + d.total_documents + ' documents loaded · Status: ' + d.status);
+    } catch(e) {
+      addSystemMsg('Could not fetch stats — is the backend running?');
+    }
+    closeSidebar();
+  }
+
+  function formatAnswer(text) {
+    let h = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+    h = h.replace(/^## (.+)$/gm,'<h2>$1</h2>');
+    h = h.replace(/^# (.+)$/gm,'<h1>$1</h1>');
+    h = h.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>');
+    h = h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    h = h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+    h = h.replace(/`(.+?)`/g,'<code>$1</code>');
+    h = h.replace(/^---$/gm,'<hr/>');
+    h = h.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
+    h = h.replace(/^[-•] (.+)$/gm,'<li>$1</li>');
+    h = h.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+    h = h.replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>');
+    h = h.replace(/(Systematic Review|Meta-Analysis|RCT|Cochrane)/gi,'<span class="ev-badge ev-high">$1</span>');
+    h = h.replace(/(Level\s*[1-5][abc]?|Grade\s*[A-D])/gi,'<span class="ev-badge ev-medium">$1</span>');
+    h = h.replace(/^(Source|Reference|Ref|Cited from):\s*(.+)$/gim,'<div class="src-footer"><span class="src-label">📚</span><span class="src-tag">$2</span></div>');
+    h = h.split('\n').map(function(line) {
+      line = line.trim();
+      if (!line) return '';
+      if (line.match(/^<(h[1-3]|ul|ol|li|hr|blockquote|div)/)) return line;
+      return '<p>' + line + '</p>';
+    }).join('\n');
+    return h;
+  }
+
+  function buildSourceFooter(sources) {
+    if (!sources) return '';
+    var tags = [];
+    var names = sources.match(/Source:\s*([^|\[\n]+)/gi);
+    if (names) names.slice(0,3).forEach(function(n) {
+      var clean = n.replace(/Source:\s*/i,'').trim().substring(0,45);
+      tags.push('<span class="src-tag">' + clean + '</span>');
+    });
+    var levels = sources.match(/(Systematic Review|Meta-Analysis|RCT|Textbook|Research Article)/gi);
+    var badges = levels ? Array.from(new Set(levels)).slice(0,2).map(function(l) {
+      var cls = ['Systematic Review','Meta-Analysis','RCT'].indexOf(l) >= 0 ? 'ev-high' : 'ev-info';
+      return '<span class="ev-badge ' + cls + '">' + l + '</span>';
+    }).join('') : '';
+    if (!tags.length && !badges) return '';
+    return '<div class="src-footer"><span class="src-label">📚 Sources:</span>' + tags.join('') + (badges ? ' ' + badges : '') + '</div>';
+  }
+
+  function getWrap() {
+    var wrap = document.querySelector('#chat-box .msg-wrap');
+    if (!wrap) { wrap = document.createElement('div'); wrap.className = 'msg-wrap'; document.getElementById('chat-box').appendChild(wrap); }
+    return wrap;
+  }
+  function removeWelcome() { var w = document.getElementById('welcome'); if (w) w.remove(); }
+  function scrollChat() { var b = document.getElementById('chat-box'); b.scrollTop = b.scrollHeight; }
+
+  function addUserMsg(text) {
+    removeWelcome();
+    var wrap = getWrap();
+    var row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = '<div class="avatar user">You</div><div class="bubble user">' + text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+    wrap.appendChild(row); scrollChat();
+  }
+  function addBotMsg(text, sources) {
+    var wrap = getWrap();
+    var row = document.createElement('div');
+    row.className = 'msg-row';
+    row.innerHTML = '<div class="avatar bot">🩺</div><div class="bubble bot"><div class="bot-body">' + formatAnswer(text) + '</div>' + buildSourceFooter(sources) + '</div>';
+    wrap.appendChild(row); scrollChat();
+  }
+  function addSystemMsg(text) {
+    removeWelcome();
+    var wrap = getWrap();
+    var el = document.createElement('div');
+    el.className = 'bubble system'; el.style.margin = '10px auto'; el.textContent = text;
+    wrap.appendChild(el); scrollChat();
+  }
+  function addTyping() {
+    var wrap = getWrap();
+    var row = document.createElement('div');
+    row.className = 'msg-row'; row.id = 'typing-row';
+    row.innerHTML = '<div class="avatar bot">🩺</div><div class="bubble bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+    wrap.appendChild(row); scrollChat();
+  }
+  function removeTyping() { var t = document.getElementById('typing-row'); if (t) t.remove(); }
+
+  function askChip(el) {
+    var text = el.textContent.replace('→','').trim();
+    document.getElementById('user-input').value = text;
+    sendMessage();
+  }
+
+  async function sendMessage() {
+    var input = document.getElementById('user-input');
+    var btn = document.getElementById('send-btn');
+    var sem = document.getElementById('sem-select') ? document.getElementById('sem-select').value : 'general';
+    var question = input.value.trim();
+    if (!question) return;
+    input.value = ''; input.style.height = 'auto'; btn.disabled = true;
+
+    addUserMsg(question);
+    addTyping();
+
+    try {
+      var wakingTimeout = setTimeout(function() {
+        removeTyping();
+        addBotMsg('⏳ Waking up the server, please wait up to 60 seconds…', '');
+      }, 3000);
+
+      var res = await fetch(API + "/chat", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: SESSION_ID, question: question, semester: sem }),
+        signal: AbortSignal.timeout(90000)
+      });
+
+      clearTimeout(wakingTimeout);
+      removeTyping();
+      var lastMsg = document.querySelector('#chat-box .msg-wrap .msg-row:last-child');
+      if (lastMsg && lastMsg.querySelector('.bot-body')) lastMsg.remove();
+
+      var d = await res.json();
+      addBotMsg(d.answer, d.sources_used);
+    } catch(e) {
+      removeTyping();
+      var lastMsg = document.querySelector('#chat-box .msg-wrap .msg-row:last-child');
+      if (lastMsg && lastMsg.querySelector('.bot-body')) lastMsg.remove();
+      addBotMsg('Connection error — the server took too long to respond. Please try again.', '');
+    }
+
+    btn.disabled = false;
+    input.focus();
+  }
+
+  document.getElementById('user-input').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+  });
+</script>
+</body>
+</html>
